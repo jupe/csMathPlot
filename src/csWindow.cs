@@ -211,7 +211,11 @@ namespace csmathplot
         String    OnMouseHelpString;
         String    OnMouseHelpStringTitle;
 
-        public mpWindow() { }
+        public mpWindow() 
+        {
+            m_layers = new List<mpLayer>();
+            m_popmenu = new MainMenu();
+        }
         public mpWindow(ref mpWindow parent, uint id,
                          ref Point pos,
                          ref Size size,
@@ -261,12 +265,15 @@ namespace csmathplot
             m_zoomingRect = new Rectangle();
             m_zoomingHorizontally = true;
 
+            m_popmenu = new MainMenu();
+
 
             m_lockaspect = false;
 
             InitPopupMenu();
 
-            m_layers.Clear();
+            m_layers = new List<mpLayer>();
+
             m_bgColour = Color.White;
             m_fgColour = Color.Black;
 
@@ -316,7 +323,7 @@ namespace csmathplot
             @retval TRUE Success
             @retval FALSE Failure due to out of memory.
         */
-        public bool AddLayer(ref mpLayer layer, bool refreshDisplay = true)
+        public bool AddLayer(mpLayer layer, bool refreshDisplay = true)
         {
             if (layer != null) {
                 m_layers.Add( layer );
