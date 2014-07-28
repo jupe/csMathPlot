@@ -27,6 +27,13 @@ namespace csmathplot
         ,mpZOOM_X
         ,mpZOOM_Y
     };
+    public enum wxOrientation
+    {
+        wxHORIZONTAL = 0x0004,
+        wxVERTICAL = 0x0008,
+        wxBOTH = wxVERTICAL | wxHORIZONTAL,
+        wxORIENTATION_MASK = wxBOTH
+    }
     public enum Direction { wxUP, wxLEFT, wxRIGHT, wxDOWN, wxTOP, wxBOTTOM, wxALL }
     public enum wxBitmapType {
       wxBITMAP_TYPE_INVALID, 
@@ -251,7 +258,7 @@ namespace csmathplot
                 + "- Wheel + CTRL: Zoom in/out";
             OnMouseHelpStringTitle ="Mouse Help";
 
-            m_zoomingRect = 0;
+            m_zoomingRect = new Rectangle();
             m_zoomingHorizontally = true;
 
 
@@ -266,15 +273,15 @@ namespace csmathplot
 
             //defaultly gradien background is disabled but colours defined.
             m_gradienBackColour=true;
-            m_gradienInitialColour = Color(150,150,200);
-            m_gradienDestColour = Color(255,255,255);
+            m_gradienInitialColour = Color.FromArgb(150,150,200);
+            m_gradienDestColour = Color.FromArgb(255, 255, 255);
             m_gradienDirect = Direction.wxUP;
 
 
             m_mouseZoomMode = mpMouseZoomType.mpZOOM_XY;
 
             m_enableScrollBars = false;
-            SetSizeHints(128, 128);
+            //SetSizeHints(128, 128);
 
             // J.L.Blanco: Eliminates the "flick" with the double buffer.
             //SetBackgroundStyle( wxBG_STYLE_CUSTOM );
@@ -294,7 +301,7 @@ namespace csmathplot
         */
         void InitPopupMenu()
         {
-            m_popmenu = new Menu();
+            //m_popmenu = new Menu();
         }
 
         /** Get reference to context menu of the plot canvas.
@@ -582,7 +589,7 @@ namespace csmathplot
 	        m_desiredXmin=xMin; m_desiredXmax=xMax;
 	        m_desiredYmin=yMin; m_desiredYmax=yMax;
 
-	        if (printSizeX!=null && printSizeY!=null)
+	        if (printSizeX!=0 && printSizeY!=0)
 	        {
 		        // Printer:
 		        m_scrX = printSizeX;
@@ -630,37 +637,36 @@ namespace csmathplot
 
 	        // It is VERY IMPORTANT to DO NOT call Refresh if we are drawing to the printer!!
 	        // Otherwise, the DC dimensions will be those of the window instead of the printer device
-            if (printSizeX == null || printSizeY == null)
+            if (printSizeX == 0 || printSizeY == 0)
 		        UpdateAll();
         }
 
         /** Zoom into current view and refresh display
           * @param centerPoint The point (pixel coordinates) that will stay in the same position on the screen after the zoom (by default, the center of the mpWindow).
           */
-        void ZoomIn(ref Point centerPoint)
+        void ZoomIn(ref Point c)
         {
-            Point c = new Point(centerPoint);
 	        if (c == null)
 	        {
 		        //GetClientSize(&m_scrX, &m_scrY);
                 m_scrX = this.Width;
                 m_scrY = this.Height;
 
-		        c.x = (m_scrX - m_marginLeft - m_marginRight)/2 + m_marginLeft; // c.x = m_scrX/2;
-		        c.y = (m_scrY - m_marginTop - m_marginBottom)/2 - m_marginTop; // c.y = m_scrY/2;
+		        c.X = (m_scrX - m_marginLeft - m_marginRight)/2 + m_marginLeft; // c.x = m_scrX/2;
+		        c.Y = (m_scrY - m_marginTop - m_marginBottom)/2 - m_marginTop; // c.y = m_scrY/2;
 	        }
 
 	        // Preserve the position of the clicked point:
-	        double prior_layer_x = p2x( c.x );
-	        double prior_layer_y = p2y( c.y );
+	        double prior_layer_x = p2x( c.X );
+	        double prior_layer_y = p2y( c.Y );
 
 	        // Zoom in:
 	        m_scaleX *= zoomIncrementalFactor;
 	        m_scaleY *= (m_mouseZoomMode==mpMouseZoomType.mpZOOM_XY ? zoomIncrementalFactor : 1 );
 
 	        // Adjust the new m_posx/y:
-	        m_posX = prior_layer_x - c.x / m_scaleX;
-	        m_posY = prior_layer_y + c.y / m_scaleY;
+	        m_posX = prior_layer_x - c.X / m_scaleX;
+	        m_posY = prior_layer_y + c.Y / m_scaleY;
 
 	        m_desiredXmin = m_posX;
 	        m_desiredXmax = m_posX + (m_scrX - m_marginLeft - m_marginRight) / m_scaleX; // m_desiredXmax = m_posX + m_scrX / m_scaleX;
@@ -676,21 +682,20 @@ namespace csmathplot
         /** Zoom out current view and refresh display
           * @param centerPoint The point (pixel coordinates) that will stay in the same position on the screen after the zoom (by default, the center of the mpWindow).
           */
-        void ZoomOut(ref Point centerPoint)
+        void ZoomOut(ref Point c)
         {
-            Point c = new Point(centerPoint);
 	        if (c == null)
 	        {
 		        //GetClientSize(&m_scrX, &m_scrY);
                 m_scrX = this.Width;
                 m_scrY = this.Height;
-		        c.x = (m_scrX - m_marginLeft - m_marginRight)/2 + m_marginLeft; // c.x = m_scrX/2;
-		        c.y = (m_scrY - m_marginTop - m_marginBottom)/2 - m_marginTop; // c.y = m_scrY/2;
+		        c.X = (m_scrX - m_marginLeft - m_marginRight)/2 + m_marginLeft; // c.x = m_scrX/2;
+		        c.Y = (m_scrY - m_marginTop - m_marginBottom)/2 - m_marginTop; // c.y = m_scrY/2;
 	        }
 
 	        // Preserve the position of the clicked point:
-	        double prior_layer_x = p2x( c.x );
-	        double prior_layer_y = p2y( c.y );
+	        double prior_layer_x = p2x( c.X );
+	        double prior_layer_y = p2y( c.Y );
 	        /*double  tmpPosX = m_posX,
                     tmpPosY = m_posY,
                     tmpDesXmin = m_desiredXmin,
@@ -718,10 +723,10 @@ namespace csmathplot
             }
 
 	        // Adjust the new m_posx/y:
-	        m_posX = prior_layer_x - c.x / m_scaleX;
+	        m_posX = prior_layer_x - c.X / m_scaleX;
 
 	        if(m_mouseZoomMode==mpMouseZoomType.mpZOOM_XY)
-                m_posY = prior_layer_y + c.y / m_scaleY;
+                m_posY = prior_layer_y + c.Y / m_scaleY;
 
 	        m_desiredXmin = m_posX;
 	        m_desiredXmax = m_posX + (m_scrX - m_marginLeft - m_marginRight) / m_scaleX; // m_desiredXmax = m_posX + m_scrX / m_scaleX;
@@ -801,7 +806,7 @@ namespace csmathplot
 	        Fit(zoom_x_min,zoom_x_max,zoom_y_min,zoom_y_max);
         }
 
-        void GetClientSize(ref int x, ref int y)
+        void GetClientSize(out int x, out int y)
         {
             x = this.Width;
             y = this.Height;
@@ -815,7 +820,7 @@ namespace csmathplot
                 if (m_enableScrollBars)
                 {
                     int cx, cy;
-                    GetClientSize( ref cx, ref cy);
+                    GetClientSize( out cx, out cy);
                     // Do x scroll bar
                     {
                         // Convert margin sizes from pixels to coordinates
@@ -847,7 +852,7 @@ namespace csmathplot
                 }
             }
 
-            Refresh( false );
+            //Refresh( false );
         }
 
         // Added methods by Davide Rondini
@@ -855,7 +860,15 @@ namespace csmathplot
         /** Counts the number of plot layers, excluding axes or text: this is to count only the layers which have a bounding box.
             \return The number of profiles plotted.
         */
-        uint CountLayers();
+        uint CountLayers()
+        {
+            uint layerNo = 0;
+            foreach(mpLayer li in m_layers)
+    	    {
+                if (li.HasBBox()) layerNo++;
+    	    };
+            return layerNo;
+        }
 
         /** Counts the number of plot layers, whether or not they have a bounding box.
             \return The number of layers in the mpWindow. */
@@ -888,11 +901,28 @@ namespace csmathplot
 
         /** Returns the bounding box coordinates
                 @param bbox Pointer to a 6-element double array where to store bounding box coordinates. */
-        void GetBoundingBox(ref double bbox);
+        void GetBoundingBox(ref double[] bbox)
+        {
+            bbox[0] = m_minX;
+	        bbox[1] = m_maxX;
+	        bbox[2] = m_minY;
+	        bbox[3] = m_maxY;
+        }
 
         /** Enable/disable scrollbars
           @param status Set to true to show scrollbars */
-        void SetMPScrollbars(bool status);
+        void SetMPScrollbars(bool status)
+        {
+            // Temporary behaviour: always disable scrollbars
+            m_enableScrollBars = status; //false;
+            if (status == false)
+            {
+                //SetScrollbar(wxOrientation.wxHORIZONTAL, 0, 0, 0);
+                //SetScrollbar(wxOrientation.wxVERTICAL, 0, 0, 0);
+            }
+            // else the scroll bars will be updated in UpdateAll();
+            UpdateAll();
+        }
 
         /** Get scrollbars status.
           @return true if scrollbars are visible */
@@ -903,7 +933,7 @@ namespace csmathplot
           @param type image type to be saved: see wxImage output file types for flags
               @param imageSize Set a size for the output image. Default is the same as the screen size
               @param fit Decide whether to fit the plot into the size*/
-        bool SaveScreenshot(ref String filename, int type, Size imageSize, bool fit = false);
+        //bool SaveScreenshot(ref String filename, int type, Size imageSize, bool fit = false);
 
         /** This value sets the zoom steps whenever the user clicks "Zoom in/out" or performs zoom with the mouse wheel.
           *  It must be a number above unity. This number is used for zoom in, and its inverse for zoom out. Set to 1.5 by default. */
@@ -916,8 +946,13 @@ namespace csmathplot
             @param right Right border
             @param bottom Bottom border
             @param left Left border */
-        void SetMargins(int top, int right, int bottom, int left);
-
+        void SetMargins(int top, int right, int bottom, int left)
+        {
+            m_marginTop = top;
+            m_marginRight = right;
+            m_marginBottom = bottom;
+            m_marginLeft = left;
+        }
         /** Set the top margin. @param top Top Margin */
         void SetMarginTop(int top) { m_marginTop = top; }
         /** Set the right margin. @param right Right Margin */
@@ -965,27 +1000,100 @@ namespace csmathplot
         /** Sets the visibility of a layer by its name.
                 @param name The layer name to set visibility
                 @param viewable the view status to be set */
-        void SetLayerVisible(ref String name, bool viewable);
+        void SetLayerVisible(ref String name, bool viewable)
+        {
+            mpLayer lx = GetLayer(ref name);
+            if (lx != null)
+            {
+                lx.SetVisible(viewable);
+                UpdateAll();
+            }
+        }
 
         /** Check whether a layer with given name is visible
                 @param name The layer name
                 @return layer visibility status */
-        bool IsLayerVisible(ref String name );
+        bool IsLayerVisible(ref String name)
+        {
+            mpLayer lx = GetLayer(ref name);
+            return (lx!=null) ? lx.IsVisible() : false;
+        }
 
         /** Sets the visibility of a layer by its position in layer list.
                 @param position The layer position in layer list
                 @param viewable the view status to be set */
-        void SetLayerVisible(uint position, bool viewable);
+        public void SetLayerVisible(int position, bool viewable)
+        {
+            mpLayer lx = GetLayer(position);
+            if (lx != null)
+            {
+                lx.SetVisible(viewable);
+                UpdateAll();
+            }
+        }
 
         /** Check whether the layer at given position is visible
                 @param position The layer position in layer list
                 @return layer visibility status */
-        bool IsLayerVisible(uint position );
+        bool IsLayerVisible(int position)
+        {
+            mpLayer lx = GetLayer(position);
+            return (lx!=null) ? lx.IsVisible() : false;
+        }
         /** Set Color theme. Provide colours to set a new colour theme.
             @param bgColour Background colour
                 @param drawColour The colour used to draw all elements in foreground, axes excluded
                 @param axesColour The colour used to draw axes (but not their labels) */
-        void SetColourTheme(ref Color bgColour, ref Color drawColour, ref Color axesColour);
+        void SetColourTheme(ref Color bgColour, ref Color drawColour, ref Color axesColour)
+        {
+            
+            this.m_bgColour = bgColour;
+            this.m_fgColour = drawColour;
+	        
+	        m_bgColour = bgColour;
+	        m_fgColour = drawColour;
+	        m_axColour = axesColour;
+	        // cycle between layers to set colours and properties to them
+            
+            foreach (mpLayer li in m_layers) {
+		        if (li.GetLayerType() == mpLayerType.mpLAYER_AXIS) {
+			        Pen axisPen = li.GetPen(); // Get the old pen to modify only colour, not style or width
+			        axisPen.Color = axesColour;
+			        li.SetPen(axisPen);
+
+			        //mpScaleX scale = (mpScaleX)li;
+			        //scale->SetTicksColour( axesColour );
+
+		        }
+		        else if (li.GetLayerType() == mpLayerType.mpLAYER_INFO) {
+			        Pen infoPen = li.GetPen(); // Get the old pen to modify only colour, not style or width
+			        infoPen.Color = drawColour;
+			        li.SetPen(infoPen);
+		        }
+		        else if (li.GetLayerType() == mpLayerType.mpLAYER_PLOT) {
+                    Pen plotPen = li.GetPen();  //Get the old pen to modify only colour, not style or width
+                    plotPen.Color = drawColour;
+                    li.SetPen(plotPen);
+
+                    Brush plotBrush = li.GetBrush(); //Get old brush
+                    //plotBrush.Color = drawColour;
+                    li.SetBrush( plotBrush );
+		        }
+		        else if (li.GetLayerType() == mpLayerType.mpLayer_POINT) {
+
+		        }
+		        else{
+		            Brush plotBrush = li.GetBrush(); //Get old brush
+                    //plotBrush.Color = drawColour;
+                    li.SetBrush( plotBrush );
+
+		            Pen plotPen = li.GetPen();  //Get the old pen to modify only colour, not style or width
+                    plotPen.Color =  drawColour;
+                    li.SetPen(plotPen);
+		        }
+	        }
+        
+        }
 
         /** Get axes draw colour
                 @return reference to axis colour used in theme */
@@ -1036,7 +1144,34 @@ namespace csmathplot
         /** Recalculate global layer bounding box, and save it in m_minX,...
           * \return true if there is any valid BBox information.
           */
-        protected virtual bool UpdateBBox();
+        protected virtual bool UpdateBBox()
+        {
+            bool first = true;
+
+            foreach(mpLayer f in m_layers )
+            {
+
+                if (f.HasBBox() && f.IsVisible()) //updated: If not visible, don't check bounding boxes! 10.11.-09 by Jussi V-A
+                {
+                    if (first)
+                    {
+                        first = false;
+                        m_minX = f.GetMinX(); m_maxX=f.GetMaxX();
+                        m_minY = f.GetMinY(); m_maxY=f.GetMaxY();
+                    }
+                    else
+                    {
+                        if (f.GetMinX()<m_minX) m_minX=f.GetMinX(); if (f.GetMaxX()>m_maxX) m_maxX=f.GetMaxX();
+                        if (f.GetMinY()<m_minY) m_minY=f.GetMinY(); if (f.GetMaxY()>m_maxY) m_maxY=f.GetMaxY();
+                    }
+                }
+                //node = node->GetNext();
+            }
+
+	        //wxLogDebug(wxT("[mpWindow::UpdateBBox] Bounding box: Xmin = %f, Xmax = %f, Ymin = %f, YMax = %f"), m_minX, m_maxX, m_minY, m_maxY);
+
+            return first == false;
+        }
 
     }
 }
