@@ -19,7 +19,7 @@ namespace csmathplot
          continuity set to false (draw separate points).
         These may or may not be used by implementations.
     */
-    public partial class mpLayer: Object
+    public abstract class mpLayer : Object
     {
         protected Font   m_font;        //!< Layer's font
         protected Pen    m_pen;         //!< Layer's pen
@@ -37,8 +37,7 @@ namespace csmathplot
 
 
 
-        public mpLayer();
-
+        //public mpLayer();
         ~mpLayer() {}
 
         /** Check whether this layer has a bounding box.
@@ -48,7 +47,7 @@ namespace csmathplot
             @retval TRUE Has bounding box
             @retval FALSE Has not bounding box
         */
-        override public bool   HasBBox() { return true; }
+        public virtual bool HasBBox() { return true; }
 
         /** Check whether the layer is an info box.
             The default implementation returns \a FALSE. It is overrided to \a TRUE for mpInfoLayer
@@ -56,11 +55,11 @@ namespace csmathplot
             info boxes.
             @return whether the layer is an info boxes
             @sa mpInfoLayer::IsInfo */
-        override public bool IsInfo() { return false; }
-        override public bool IsInfoLegendLayer() { return false; }
-        override public bool IsMovableLayer(){ return false; }
-        override public bool IsScaleXLayer(){return false;}
-        override public bool IsScaleYLayer(){return false;}
+        public virtual bool IsInfo() { return false; }
+        public virtual bool IsInfoLegendLayer() { return false; }
+        public virtual bool IsMovableLayer() { return false; }
+        public virtual bool IsScaleXLayer() { return false; }
+        public virtual bool IsScaleYLayer() { return false; }
 
         /** Check whether the layer is an point.
             The default implementation returns \a FALSE. It is overrided to \a TRUE for mpInfoLayer
@@ -68,27 +67,27 @@ namespace csmathplot
             point layer.
             @return whether the layer is an point layer
             @sa mpPointLayer::IsPointEnabled */
-        override public bool IsPointLayer() { return false; }
-        override public void UpdateMouseCoord(ref mpWindow w, ref EventArgs args){}
+        public virtual bool IsPointLayer() { return false; }
+        public virtual void UpdateMouseCoord(ref mpWindow w, ref EventArgs args) { }
         /** Get inclusive left border of bounding box.
             @return Value
         */
-        override public double GetMinX() { return -1.0; }
+        public virtual double GetMinX() { return -1.0; }
 
         /** Get inclusive right border of bounding box.
             @return Value
         */
-        override public double GetMaxX() { return  1.0; }
+        public virtual double GetMaxX() { return 1.0; }
 
         /** Get inclusive bottom border of bounding box.
             @return Value
         */
-        override public double GetMinY() { return -1.0; }
+        public virtual double GetMinY() { return -1.0; }
 
         /** Get inclusive top border of bounding box.
             @return Value
         */
-        override public double GetMaxY() { return  1.0; }
+        public virtual double GetMaxY() { return 1.0; }
         /**
          *  Search for the closest coordinate of the curve  @Jussi Vatjus-Anttila 9.-09
          *  So far, only implemented on mpFXY layer.
@@ -98,7 +97,7 @@ namespace csmathplot
          *  @param y [in+out]  search y coordinate near and set curve coordinate if found
          *  @return true if found curve coordinate
          */
-        override public bool GetNearestCoord(ref mpWindow w, ref double x, ref double y) { return false; }
+        public virtual bool GetNearestCoord(ref mpWindow w, ref double x, ref double y) { return false; }
 
         /** Plot given view of layer to the given device context.
             An implementation of this function has to transform layer coordinates to
@@ -141,7 +140,7 @@ namespace csmathplot
             @param w  View to plot. The visible area can be retrieved from this object.
             @sa mpWindow::p2x,mpWindow::p2y,mpWindow::x2p,mpWindow::y2p
         */
-        override public void   Plot(ref Graphics dc, ref mpWindow w);
+        public abstract void Plot(ref Graphics dc, ref mpWindow w);
 
         /** Get layer name.
             @return Name
@@ -198,7 +197,18 @@ namespace csmathplot
         /** Get a small square bitmap filled with the colour of the pen used in the layer. Useful to create legends or similar reference to the layers.
             @param side side length in pixels
             @return a wxBitmap filled with layer's colour */
-        public Bitmap GetColourSquare(int side = 16);
+        public Bitmap GetColourSquare(int side = 16)
+        {
+            Bitmap square = new Bitmap(side, side, null);
+            /*Color filler = m_pen.GetColour();
+            Brush brush(filler, wxSOLID);
+            MemoryDC dc;
+            dc.SelectObject(square);
+            dc.SetBackground(brush);
+            dc.Clear();
+            dc.SelectObject(wxNullBitmap);*/
+            return square;
+        }
 
         /** Get layer type: a Layer can be of different types: plot lines, axis, info boxes, etc, this method returns the right value.
             @return An integer indicating layer type */
