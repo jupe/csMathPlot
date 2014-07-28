@@ -1,4 +1,6 @@
 csMathPlot
 ==========
 
+! UNDER DEVELOPMENT ! THERE IS NOT YET ANYTHING WORKING STUFF ! GO AWAY !
+
 mpMathPlot C# port
