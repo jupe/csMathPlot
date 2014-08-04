@@ -39,17 +39,17 @@ namespace csmathplot
         {
             if (m_visible)
             {
+
+                SizeF tw = g.MeasureString(GetName(), m_font);
+                
                 /*dc.Pen(m_pen);
                 dc.SetFont(m_font);
-
                 Point tw = 0, th = 0;
                 dc.GetTextExtent(GetName(), &tw, &th);*/
-
                 //     int left = -dc.LogicalToDeviceX(0);
                 //     int width = dc.LogicalToDeviceX(0) - left;
                 //     int bottom = dc.LogicalToDeviceY(0);
                 //     int height = bottom - -dc.LogicalToDeviceY(0);
-
                 /*    dc.DrawText( GetName(),
                     (int)((((float)width/100.0) * m_offsety) + left - (tw/2)),
                     (int)((((float)height/100.0) * m_offsetx) - bottom) );*/

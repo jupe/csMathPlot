@@ -13,7 +13,7 @@ namespace csmathplot
         Any number of mpLayer implementations can be attached to mpWindow.
         Examples for mpLayer implementations are function graphs, or scale rulers.
 
-        For convenience mpLayer defines a name, a font (wxFont), a pen (wxPen),
+        For convenience mpLayer defines a name, a font, a pen ,
         and a continuity property (bool) as class members.
         The default values at constructor are the default font, a black pen, and
          continuity set to false (draw separate points).
@@ -21,15 +21,15 @@ namespace csmathplot
     */
     public abstract class mpLayer : Object
     {
-        protected Font   m_font;        //!< Layer's font
-        protected Pen    m_pen;         //!< Layer's pen
-        protected Brush  m_brush;       //!< Layer's brush
-        protected String m_name;        //!< Layer's name
-        protected bool     m_continuous;  //!< Specify if the layer will be plotted as a continuous line or a set of points.
-        protected bool     m_showName;    //!< States whether the name of the layer must be shown (default is true).
-        protected bool     m_drawOutsideMargins; //!< select if the layer should draw only inside margins or over all DC
+        protected Font        m_font;        //!< Layer's font
+        protected Pen         m_pen;         //!< Layer's pen
+        protected Brush       m_brush;       //!< Layer's brush
+        protected String      m_name;        //!< Layer's name
+        protected bool        m_continuous;  //!< Specify if the layer will be plotted as a continuous line or a set of points.
+        protected bool        m_showName;    //!< States whether the name of the layer must be shown (default is true).
+        protected bool        m_drawOutsideMargins; //!< select if the layer should draw only inside margins or over all DC
         protected mpLayerType m_type;     //!< Define layer type, which is assigned by constructor
-        protected bool    m_visible;          //!< Toggles layer visibility
+        protected bool        m_visible;          //!< Toggles layer visibility
 
         protected mpShape m_pointType; //!< Define a point type, the default is a simple point
         protected Size  m_RectSize; //!< The size of rectangles, when plotstyle mpRECT is used

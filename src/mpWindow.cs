@@ -405,9 +405,8 @@ namespace csmathplot
         /**
         *   CHange drawing order of layer.
         */
-        /*void SetLayerPosition(ref mpLayer layer, int position)
+        void SetLayerPosition(ref mpLayer layer, int position)
         {
-            wxLayerList::iterator it;
             List<mpLayer> old = m_layers;
             int old_position = 0;
             for (it = old.First(); it != old.Last(); it++, old_position++)
@@ -422,6 +421,7 @@ namespace csmathplot
                 m_layers.Add(old[i]);
             }
         }
+        /*
         void SetLayerBottom(ref mpLayer layer);
         void SetLayerTop(ref mpLayer layer);
         */
